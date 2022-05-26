@@ -2,8 +2,6 @@ package io.amit.rest.controller;
 
 import java.util.List;
 
-import javax.websocket.server.PathParam;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.amit.rest.StudentRepository;
+import io.amit.rest.controller.exception.UserNotFoundException;
 import io.amit.rest.model.Student;
 
 @RestController
@@ -40,9 +39,16 @@ public class StudentController {
 	}
 
 	@GetMapping("/{id}")
-	public Student getStudentbyId(@PathVariable("id") Integer id) {
+	public Student getStudentbyId(@PathVariable("id") Integer id) throws Exception {
 		System.out.println("id value ********* :" + id);
-		return repository.findById(id).get();
+		boolean isExists = repository.findById(id).isPresent();
+		// orElseThrow(UserNotFoundException::new);
+
+		if (isExists) {
+			return repository.findById(id).get();
+		} else {
+			throw new UserNotFoundException("id :"+id);
+		}
 
 	}
 
